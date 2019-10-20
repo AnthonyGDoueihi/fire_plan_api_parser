@@ -4,6 +4,7 @@ import requests
 import io
 import datetime
 from math import sin, cos, sqrt, atan2, radians
+import boto3
 
 def get_distance_from_latLng(lat1, lat2, lng1, lng2):
     lat1 = radians(lat1)
@@ -19,6 +20,7 @@ def get_distance_from_latLng(lat1, lat2, lng1, lng2):
     return R * c
 
 def lambda_handler(event, context):
+    '''
     now = datetime.datetime.now()
     url = 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs/csv/VNP14IMGTDL_NRT_Global_24h.csv'
     response = requests.get(url)
@@ -29,8 +31,17 @@ def lambda_handler(event, context):
             distance = get_distance_from_latLng(1, float(row['latitude']), -50, float(row['longitude']))
             print(distance)
             break
+    '''
+    
+    dynamodb = boto3.client('dynamodb')
+
+    items = dynamodb.scan(TableName='FireActionUser',
+        IndexName='id-index',
+        Select='ALL_ATTRIBUTES')
+
+    print(f'Response is HERE: {items}')
 
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'body': 'Yay'
     }
